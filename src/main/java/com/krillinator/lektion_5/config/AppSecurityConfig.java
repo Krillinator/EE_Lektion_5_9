@@ -3,6 +3,7 @@ package com.krillinator.lektion_5.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -23,18 +24,28 @@ public class AppSecurityConfig {
                         .requestMatchers("/admin-page").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                // .httpBasic() Deprecated
+                .formLogin(Customizer.withDefaults())
+                // .httpBasic()
                 .build();
     }
 
+    @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("benny")
+        // USER
+        UserDetails benny = User.withDefaultPasswordEncoder()
+                .username("frida")
                 .password("123")
                 .roles("USER")
                 .build();
 
-                return new InMemoryUserDetailsManager(user);
+        // ADMIN
+        UserDetails anton = User.withDefaultPasswordEncoder()
+                .username("anton")
+                .password("123")
+                .roles("ADMIN")
+                .build();
+
+                return new InMemoryUserDetailsManager(benny, anton);
     }
 
 }
