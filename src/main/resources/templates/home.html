@@ -8,7 +8,17 @@
 <body>
     <h1> Welcome HOME! </h1>
     <p> Are you ready to rumble? </p>
-    <a th:href="@{/admin-page}">To Secret Admin Page</a>
+    <ul>
+        <li>
+            <a th:href="@{/admin-page}">To Secret Admin Page</a>
+        </li>
+        <li>
+            <a th:href="@{/api/helloAdmin}">helloAdmin - Need to be ADMIN</a>
+        </li>
+        <li>
+            <a th:href="@{/api/sayGet}">Say Get - Need permission GET</a>
+        </li>
+    </ul>
 
 </body>
 </html>

@@ -1,7 +1,6 @@
 package com.krillinator.lektion_5.config;
 
-
-import com.krillinator.lektion_5.user.Roles;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -14,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.krillinator.lektion_5.user.Roles.*;
+import static com.krillinator.lektion_5.models.user.Roles.*;
 
 @Configuration
 @EnableWebSecurity
@@ -29,11 +28,21 @@ public class AppSecurityConfig {
     //      ROLE_USER   == GET, POST
     //      ROLE_GUEST  == GET
 
+    // TODO - Talk about Deprecated stuff!
+
+
+    private final AppPasswordConfig appPasswordConfig;
+
+    @Autowired
+    public AppSecurityConfig(AppPasswordConfig appPasswordConfig) {
+        this.appPasswordConfig = appPasswordConfig;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/", "/hash").permitAll()
                         .requestMatchers("/admin-page").hasRole(ADMIN.name())
                         .anyRequest().authenticated()
                 )
@@ -56,17 +65,17 @@ public class AppSecurityConfig {
         // USER
         UserDetails frida = User.withDefaultPasswordEncoder()
                 .username("frida")
-                .password("123")
-                .roles(USER.name())     // "USER"
+                .password(appPasswordConfig.bCryptPasswordEncoder().encode("123"))
+                // .roles(USER.name())     // "USER"
                 .authorities(USER.getPermissions())
                 .build();
 
         // ADMIN
-        UserDetails anton = User.withDefaultPasswordEncoder()
+        UserDetails anton = User.builder()
                 .username("anton")
-                .password("123")
-                .roles(ADMIN.name())    // "ADMIN"
-                .authorities(ADMIN.getPermissions())
+                .password(appPasswordConfig.bCryptPasswordEncoder().encode("123"))
+                .roles("ADMIN")
+                // .authorities(ADMIN.name(), ADMIN.splitPermissions().toString())
                 .build();
 
                 return new InMemoryUserDetailsManager(frida, anton);

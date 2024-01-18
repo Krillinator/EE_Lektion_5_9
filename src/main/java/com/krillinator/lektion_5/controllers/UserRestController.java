@@ -1,5 +1,7 @@
 package com.krillinator.lektion_5.controllers;
 
+import com.krillinator.lektion_5.config.AppPasswordConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -7,11 +9,28 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.function.EntityResponse;
 
 @RestController
 @RequestMapping("/api")
 public class UserRestController {
+
+    private final AppPasswordConfig appPasswordConfig;
+
+    @Autowired
+    public UserRestController(AppPasswordConfig appPasswordConfig) {
+        this.appPasswordConfig = appPasswordConfig;
+    }
+
+    @GetMapping("/hash")
+    public ResponseEntity<String> testBcryptHash(
+            @RequestParam String password
+    ) {
+
+        return new ResponseEntity<>(
+                appPasswordConfig.bCryptPasswordEncoder().encode(password),
+                HttpStatus.ACCEPTED
+        );
+    }
 
     @GetMapping("/helloAdmin")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -27,7 +46,6 @@ public class UserRestController {
         return new ResponseEntity<>("Hello USER!", HttpStatus.ACCEPTED);
     }
 
-    // TODO - Check if it works for WHOLE STRING! (ADMIN)
     @GetMapping("/sayGet")
     @PreAuthorize("hasAuthority('GET')")
     public ResponseEntity<String> checkGetAuthority() {
