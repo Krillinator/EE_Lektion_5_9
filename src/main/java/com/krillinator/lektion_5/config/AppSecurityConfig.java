@@ -1,19 +1,14 @@
 package com.krillinator.lektion_5.config;
 
-import com.krillinator.lektion_5.models.user.Roles;
+import com.krillinator.lektion_5.models.user.UserEntityDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import static com.krillinator.lektion_5.models.user.Roles.*;
@@ -33,54 +28,38 @@ public class AppSecurityConfig {
 
     // TODO - Talk about Deprecated stuff!
 
-
     private final AppPasswordConfig appPasswordConfig;
+    private final UserEntityDetailsService userEntityDetailsService;
 
     @Autowired
-    public AppSecurityConfig(AppPasswordConfig appPasswordConfig) {
+    public AppSecurityConfig(AppPasswordConfig appPasswordConfig, UserEntityDetailsService userEntityDetailsService) {
         this.appPasswordConfig = appPasswordConfig;
+        this.userEntityDetailsService = userEntityDetailsService;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/hash").permitAll()
+                        .requestMatchers("/", "/hash", "/api/user").permitAll()
                         .requestMatchers("/admin-page").hasRole(ADMIN.name())
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .formLogin(Customizer.withDefaults())   // Override /login
                 // .httpBasic()
+                .authenticationProvider(daoAuthenticationProvider())    // Tell Spring to use our implementation (Password & Service)
                 .build();
     }
 
-    // Override Users
-    @Bean
-    public UserDetailsService userDetailsService() {
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 
-        /* INPUT --> "BATMAN"
-        *       ROLE_BATMAN
-        *       ROLE_ADMIN
-        *       ROLE_USER
-        *       ROLE_GUEST
-        * */
+        provider.setPasswordEncoder(appPasswordConfig.bCryptPasswordEncoder());
+        provider.setUserDetailsService(userEntityDetailsService);
 
-        // USER
-        UserDetails frida = User.withDefaultPasswordEncoder()
-                .username("frida")
-                .password(appPasswordConfig.bCryptPasswordEncoder().encode("123"))
-                // .roles(USER.name())     // "USER"
-                .authorities(USER.getPermissions())
-                .build();
-
-        // ADMIN
-        UserDetails anton = User.builder()
-                .username("anton")
-                .password(appPasswordConfig.bCryptPasswordEncoder().encode("123"))
-                .authorities(ADMIN.getAuthorities())
-                .build();
-
-                return new InMemoryUserDetailsManager(frida, anton);
+        return provider;
     }
+
 
 }

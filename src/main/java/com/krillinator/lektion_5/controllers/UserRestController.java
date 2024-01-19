@@ -1,25 +1,50 @@
 package com.krillinator.lektion_5.controllers;
 
 import com.krillinator.lektion_5.config.AppPasswordConfig;
+import com.krillinator.lektion_5.models.user.UserEntity;
+import com.krillinator.lektion_5.models.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/* TODO - Problem Authentication for PostMapping
+*
+*
+* */
 
 @RestController
 @RequestMapping("/api")
 public class UserRestController {
 
     private final AppPasswordConfig appPasswordConfig;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserRestController(AppPasswordConfig appPasswordConfig) {
+    public UserRestController(AppPasswordConfig appPasswordConfig, UserRepository userRepository) {
         this.appPasswordConfig = appPasswordConfig;
+        this.userRepository = userRepository;
     }
+
+    @PostMapping("/user")
+    public ResponseEntity<UserEntity> createNewUser(@RequestBody UserEntity newUser) {
+
+        UserEntity userEntity = new UserEntity(
+                newUser.getUsername(),
+                newUser.getPassword(),
+                List.of(),
+                newUser.isAccountNonExpired(),
+                newUser.isAccountNonLocked(),
+                newUser.isEnabled(),
+                newUser.isCredentialsNonExpired()
+        );
+
+        return new ResponseEntity<>(userRepository.save(userEntity), HttpStatus.CREATED);
+    }
+
 
     @GetMapping("/hash")
     public ResponseEntity<String> testBcryptHash(

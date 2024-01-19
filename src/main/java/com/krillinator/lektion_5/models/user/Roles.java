@@ -37,9 +37,9 @@ public enum Roles {
         List<GrantedAuthority> permissions = new ArrayList<>();
 
         permissions.add(role);
-        permissions.addAll(splitPermissions());
+        permissions.addAll(splitPermissions()); // [GET, POST]
 
-        return permissions;
+        return permissions;     // [ROLE_ADMIN, GET, POST]
     }
 
 }
