@@ -1,5 +1,6 @@
 package com.krillinator.lektion_5.config;
 
+import com.krillinator.lektion_5.models.user.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,6 +8,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -74,8 +77,7 @@ public class AppSecurityConfig {
         UserDetails anton = User.builder()
                 .username("anton")
                 .password(appPasswordConfig.bCryptPasswordEncoder().encode("123"))
-                .roles("ADMIN")
-                // .authorities(ADMIN.name(), ADMIN.splitPermissions().toString())
+                .authorities(ADMIN.getAuthorities())
                 .build();
 
                 return new InMemoryUserDetailsManager(frida, anton);

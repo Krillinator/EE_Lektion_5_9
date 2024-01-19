@@ -3,6 +3,7 @@ package com.krillinator.lektion_5.models.user;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +29,17 @@ public enum Roles {
         return Arrays.stream(permissionsArray)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+    }
+
+    public List<GrantedAuthority> getAuthorities() {
+
+        SimpleGrantedAuthority role = new SimpleGrantedAuthority("ROLE_" + name());
+        List<GrantedAuthority> permissions = new ArrayList<>();
+
+        permissions.add(role);
+        permissions.addAll(splitPermissions());
+
+        return permissions;
     }
 
 }

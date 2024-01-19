@@ -23,11 +23,12 @@ public class UserRestController {
 
     @GetMapping("/hash")
     public ResponseEntity<String> testBcryptHash(
-            @RequestParam String password
+            @RequestParam(defaultValue = "", required = false) String continueParam,
+            @RequestParam(defaultValue = "", required = false) String inputPassword
     ) {
 
         return new ResponseEntity<>(
-                appPasswordConfig.bCryptPasswordEncoder().encode(password),
+                appPasswordConfig.bCryptPasswordEncoder().encode(inputPassword),
                 HttpStatus.ACCEPTED
         );
     }
