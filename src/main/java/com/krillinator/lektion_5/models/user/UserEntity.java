@@ -20,10 +20,11 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;            // TODO - UUID
 
+    // @Column(unique = true) Make values UNIQUE
+    @Size(min = 1, max = 64)
     private String username;
 
-    // TODO - IMPORTANT --> @Min() <-- Is mainly for Numerics
-    @Size(min = 4, max = 64)
+    @Size(min = 4, max = 64, message = "Password must contain at least 4-64 chars")
     private String password;
     private boolean accountNonExpired;
     private boolean accountNonLocked;

@@ -23,12 +23,8 @@ public class UserController {
         this.appPasswordConfig = appPasswordConfig;
     }
 
-    // TODO - Discuss Model model VS UserEntity userEntity
     @GetMapping("/register")
-    public String registerUserPage(
-       UserEntity userEntity   // Enables Error Messages
-    ) {
-
+    public String registerUserPage(UserEntity userEntity) {
 
         return "register";
     }
@@ -36,12 +32,8 @@ public class UserController {
     @PostMapping("/register")
     public String registerUser(
             @Valid UserEntity userEntity,   // Enables Error Messages
-            BindingResult result,           // Ties the object with result
-            Model model                     // Thymeleaf
+            BindingResult result           // Ties the object with result
     ) {
-
-        // TODO - Talk about this
-        model.addAttribute("userEntity", userEntity);
 
         // Check FOR @Valid Errors
         if (result.hasErrors()) {
@@ -52,6 +44,11 @@ public class UserController {
         userEntity.setPassword(
                 appPasswordConfig.bCryptPasswordEncoder().encode(userEntity.getPassword())
         );
+
+        userEntity.setAccountEnabled(true);
+        userEntity.setAccountNonLocked(true);
+        userEntity.setAccountNonExpired(true);
+        userEntity.setCredentialsNonExpired(true);
 
         userRepository.save(userEntity);
 
