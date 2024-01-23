@@ -3,18 +3,16 @@ package com.krillinator.lektion_5.controllers;
 import com.krillinator.lektion_5.config.AppPasswordConfig;
 import com.krillinator.lektion_5.models.user.UserEntity;
 import com.krillinator.lektion_5.models.user.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-/* TODO - Problem Authentication for PostMapping
-*
-*
-* */
 
 @RestController
 @RequestMapping("/api")
@@ -34,7 +32,7 @@ public class UserRestController {
 
         UserEntity userEntity = new UserEntity(
                 newUser.getUsername(),
-                newUser.getPassword(),
+                appPasswordConfig.bCryptPasswordEncoder().encode(newUser.getPassword()),
                 List.of(),
                 newUser.isAccountNonExpired(),
                 newUser.isAccountNonLocked(),

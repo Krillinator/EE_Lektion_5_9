@@ -1,8 +1,11 @@
 package com.krillinator.lektion_5.models.user;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -18,14 +21,17 @@ public class UserEntity implements UserDetails {
     private long id;            // TODO - UUID
 
     private String username;
+
+    // TODO - IMPORTANT --> @Min() <-- Is mainly for Numerics
+    @Size(min = 4, max = 64)
     private String password;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean accountEnabled;
     private boolean credentialsNonExpired;
 
-    @Transient
-    @JsonIgnore
+    @Transient  // Do NOT persist through JPA (DB)
+    @JsonIgnore // Do NOT add this attribute to API requests
     private List<GrantedAuthority> authority;
 
     public UserEntity() {}

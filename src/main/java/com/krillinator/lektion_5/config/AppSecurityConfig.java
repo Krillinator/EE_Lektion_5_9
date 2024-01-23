@@ -9,6 +9,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
 import static com.krillinator.lektion_5.models.user.Roles.*;
@@ -26,8 +27,6 @@ public class AppSecurityConfig {
     //      ROLE_USER   == GET, POST
     //      ROLE_GUEST  == GET
 
-    // TODO - Talk about Deprecated stuff!
-
     private final AppPasswordConfig appPasswordConfig;
     private final UserEntityDetailsService userEntityDetailsService;
 
@@ -40,14 +39,13 @@ public class AppSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf((csrf) -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/hash", "/api/user").permitAll()
-                        .requestMatchers("/admin-page").hasRole(ADMIN.name())
-                        .anyRequest().permitAll()
-                )
+                                .requestMatchers("/", "/hash", "/register", "/api/user").permitAll()
+                                .requestMatchers("/admin-page").hasRole(ADMIN.name())
+                                .anyRequest().permitAll()
+                        )
                 .formLogin(Customizer.withDefaults())   // Override /login
-                // .httpBasic()
                 .authenticationProvider(daoAuthenticationProvider())    // Tell Spring to use our implementation (Password & Service)
                 .build();
     }
