@@ -9,7 +9,7 @@
         <h1>Register User Page</h1>
         <form method="post" th:action="@{/register}" th:object="${userEntity}">
             <label for="username">username</label>
-            <input type="text" th:field="*{username}" placeholder="username..." id="username">
+            <input type="text" th:field="*{username}" placeholder="username..." id="username" autofocus>
 
             <label for="password">password</label>
             <input type="password" th:field="*{password}" placeholder="password..." id="password">

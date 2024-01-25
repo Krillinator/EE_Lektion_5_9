@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.krillinator.lektion_5.models.user.Roles.ADMIN;
@@ -25,10 +26,10 @@ public class Lektion5Application {
 		userEntity.setRole(ADMIN);
 
 		System.out.println("DEBUGGING " + ADMIN.name());
-
 		System.out.println("DEBUGGING #2 " + userEntity.getAuthorities());
+		System.out.println("DEBUGGING #3 " + userEntity.getRole().splitPermissions());
 
-
+		System.out.println((int) TimeUnit.DAYS.toSeconds(21));
 
 	}
 

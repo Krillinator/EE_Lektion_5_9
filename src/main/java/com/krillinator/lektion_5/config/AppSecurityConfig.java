@@ -5,12 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.concurrent.TimeUnit;
 
 import static com.krillinator.lektion_5.models.user.Roles.*;
 
@@ -39,13 +40,33 @@ public class AppSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)                  // Can cause 403 Forbidden
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers("/", "/hash", "/register", "/api/user").permitAll()
                                 .requestMatchers("/admin-page").hasRole(ADMIN.name())
                                 .anyRequest().permitAll()
                         )
-                .formLogin(Customizer.withDefaults())   // Override /login
+
+                .formLogin( formLogin -> formLogin
+                        .loginPage("/login")                    // Override /login
+                        // .usernameParameter("email")
+                )
+
+                .rememberMe(rememberMe -> rememberMe
+                        .tokenValiditySeconds(Math.toIntExact(TimeUnit.DAYS.toSeconds(21)))    // TODO - Do not like casting
+                        .key("someSecureKey")                                                     // TODO - Change to some secure key
+                        .userDetailsService(userEntityDetailsService)
+                        .rememberMeParameter("remember-me")
+                )
+
+                .logout( logout -> logout
+                        .logoutUrl("/perform_logout")
+                        .clearAuthentication(true)
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID", "remember-me")
+                        .logoutSuccessUrl("/login")
+                )
+
                 .authenticationProvider(daoAuthenticationProvider())    // Tell Spring to use our implementation (Password & Service)
                 .build();
     }
