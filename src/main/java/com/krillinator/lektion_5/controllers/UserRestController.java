@@ -1,6 +1,7 @@
 package com.krillinator.lektion_5.controllers;
 
 import com.krillinator.lektion_5.config.AppPasswordConfig;
+import com.krillinator.lektion_5.models.user.Roles;
 import com.krillinator.lektion_5.models.user.UserEntity;
 import com.krillinator.lektion_5.models.user.UserRepository;
 import jakarta.validation.Valid;
@@ -8,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +31,38 @@ public class UserRestController {
         this.userRepository = userRepository;
     }
 
+    @GetMapping("/myPerms")
+    public ResponseEntity<String> viewPermissions() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Get the principal (authenticated user)
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            // If the principal is a UserDetails object (which it should be), you can cast it
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            String authorities = userDetails.getAuthorities().toString();
+
+            // Now you have the username of the currently logged-in user
+            System.out.println("Currently logged-in user: " + username + authorities);
+        } else {
+            // Handle the case where the principal is not a UserDetails object
+            System.out.println("Unable to determine the currently logged-in user");
+        }
+
+        // Your method logic...
+
+        return new ResponseEntity<>("Check log", HttpStatus.ACCEPTED);
+    }
+
     @PostMapping("/user")
     public ResponseEntity<UserEntity> createNewUser(@RequestBody UserEntity newUser) {
 
         UserEntity userEntity = new UserEntity(
                 newUser.getUsername(),
                 appPasswordConfig.bCryptPasswordEncoder().encode(newUser.getPassword()),
-                List.of(),
+                Roles.ADMIN,
                 newUser.isAccountNonExpired(),
                 newUser.isAccountNonLocked(),
                 newUser.isEnabled(),

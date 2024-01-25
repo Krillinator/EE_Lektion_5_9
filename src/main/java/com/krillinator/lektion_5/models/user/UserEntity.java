@@ -2,9 +2,6 @@ package com.krillinator.lektion_5.models.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +15,7 @@ public class UserEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;            // TODO - UUID
+    private long id;
 
     // @Column(unique = true) Make values UNIQUE
     @Size(min = 1, max = 64)
@@ -26,31 +23,35 @@ public class UserEntity implements UserDetails {
 
     @Size(min = 4, max = 64, message = "Password must contain at least 4-64 chars")
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Roles role;
+
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean accountEnabled;
     private boolean credentialsNonExpired;
 
-    @Transient  // Do NOT persist through JPA (DB)
-    @JsonIgnore // Do NOT add this attribute to API requests
-    private List<GrantedAuthority> authority;
-
     public UserEntity() {}
-    public UserEntity(String username, String password, List<GrantedAuthority> authority,
+    public UserEntity(String username, String password, Roles roles,
                       boolean accountNonExpired, boolean accountNonLocked, boolean accountEnabled, boolean credentialsNonExpired) {
         this.username = username;
         this.password = password;
-        this.authority = authority;
+        this.role = roles;
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.accountEnabled = accountEnabled;
         this.credentialsNonExpired = credentialsNonExpired;
     }
 
-    // TODO - CHECK WITH ROLES
+    // TODO - ? extends what does it do?
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authority;
+
+        // [GET, POST]
+        // From ROLES ([ROLE_ADMIN, GET, POST])
+        // return role.getAuthorities();
+        return role.getAuthorities();
     }
 
     @Override
@@ -83,16 +84,20 @@ public class UserEntity implements UserDetails {
         return accountEnabled;
     }
 
+    public Roles getRole() {
+        return role;
+    }
+
+    public void setRole(Roles role) {
+        this.role = role;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void setAuthority(List<GrantedAuthority> authority) {
-        this.authority = authority;
     }
 
     public void setAccountNonExpired(boolean accountNonExpired) {

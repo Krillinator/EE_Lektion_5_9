@@ -6,43 +6,47 @@
 </head>
 <body>
     <div>
-    <h1>Register User Page</h1>
-    <form method="post" th:action="@{/register}" th:object="${userEntity}">
-        <label for="username">username</label>
-        <input type="text" th:field="*{username}" placeholder="username..." id="username">
+        <h1>Register User Page</h1>
+        <form method="post" th:action="@{/register}" th:object="${userEntity}">
+            <label for="username">username</label>
+            <input type="text" th:field="*{username}" placeholder="username..." id="username">
 
-        <label for="password">password</label>
-        <input type="password" th:field="*{password}" placeholder="password..." id="password">
-        <button type="submit"> Register </button>
+            <label for="password">password</label>
+            <input type="password" th:field="*{password}" placeholder="password..." id="password">
 
-        <!-- Singular Error -->
-        <!-- TODO - Unexpected Behavior with Thymeleaf Errors -->
-        <!-- IMPORTANT : Must be inside FORM -->
-        <p 	th:if="${#fields.hasErrors('username')}"
-              th:errorclass="error"
-              th:errors="*{username}">
-        </p>
+            <label for="roles">Select Role:</label>
+            <select id="roles" name="roles" th:field="*{role}">
+                <option th:each="role : ${roles}" th:value="${role.name()}" th:text="${role.name()}"></option>
+            </select>
 
-        <!-- Show MULTIPLE errors at once -->
-        <ul>
-            <li th:each="error : ${#fields.errors('password')}" th:text="${error}" class="error">
-        </ul>
+            <button type="submit"> Register </button>
 
-        <!-- Show ANY error in the form -->
-        <div th:if="${#fields.hasAnyErrors()}">
+            <!-- IMPORTANT : Must be inside FORM -->
+            <p 	th:if="${#fields.hasErrors('username')}"
+                  th:errorclass="error"
+                  th:errors="*{username}">
+            </p>
+
+            <!-- Show MULTIPLE errors at once -->
             <ul>
-                <li th:each="error : ${#fields.allErrors()}" th:text="${error}">
-
-                </li>
+                <li th:each="error : ${#fields.errors('password')}" th:text="${error}" class="error">
             </ul>
-        </div>
 
-    </form>
+            <!-- Show ANY error in the form -->
+            <div th:if="${#fields.hasAnyErrors()}">
+                <ul>
+                    <li th:each="error : ${#fields.allErrors()}" th:text="${error}">
+
+                    </li>
+                </ul>
+            </div>
+
+        </form>
 
 
 
-    <p>Debugging, don't mind this input! :)</p>
-    <input name="username" >
+        <p>Debugging, don't mind this input! :)</p>
+        <input name="username" >
 
     </div>
 

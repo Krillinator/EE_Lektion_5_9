@@ -1,6 +1,7 @@
 package com.krillinator.lektion_5.controllers;
 
 import com.krillinator.lektion_5.config.AppPasswordConfig;
+import com.krillinator.lektion_5.models.user.Roles;
 import com.krillinator.lektion_5.models.user.UserEntity;
 import com.krillinator.lektion_5.models.user.UserRepository;
 import jakarta.validation.Valid;
@@ -24,7 +25,9 @@ public class UserController {
     }
 
     @GetMapping("/register")
-    public String registerUserPage(UserEntity userEntity) {
+    public String registerUserPage(UserEntity userEntity, Model model) {
+
+        model.addAttribute("roles", Roles.values());
 
         return "register";
     }
@@ -32,7 +35,8 @@ public class UserController {
     @PostMapping("/register")
     public String registerUser(
             @Valid UserEntity userEntity,   // Enables Error Messages
-            BindingResult result           // Ties the object with result
+            BindingResult result,           // Ties the object with result
+            Roles roles
     ) {
 
         // Check FOR @Valid Errors

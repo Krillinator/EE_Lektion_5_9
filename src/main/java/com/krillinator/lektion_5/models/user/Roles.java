@@ -23,6 +23,7 @@ public enum Roles {
         return permissions;
     }
 
+    // WILL NOT RETURN ROLE (only permissions)
     public List<GrantedAuthority> splitPermissions() {
         String[] permissionsArray = permissions.split("_");
 
@@ -31,9 +32,11 @@ public enum Roles {
                 .collect(Collectors.toList());
     }
 
+    // WILL return ROLE + Permissions
     public List<GrantedAuthority> getAuthorities() {
 
         SimpleGrantedAuthority role = new SimpleGrantedAuthority("ROLE_" + name());
+
         List<GrantedAuthority> permissions = new ArrayList<>();
 
         permissions.add(role);
