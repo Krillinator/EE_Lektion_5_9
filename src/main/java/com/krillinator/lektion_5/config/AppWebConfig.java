@@ -24,7 +24,8 @@ public class AppWebConfig implements WebMvcConfigurer {
     // TODO - Is the 'resources' really necessary?
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/resources/**", "/static/**")
-                .addResourceLocations("/resources/", "classpath:/static/");
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/");
     }
+
 }

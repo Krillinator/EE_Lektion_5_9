@@ -42,13 +42,16 @@ public class AppSecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)                  // Can cause 403 Forbidden
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/", "/hash", "/register", "/api/user").permitAll()
+                                .requestMatchers("/", "/hash", "/register", "/api/user", "/static/**").permitAll()
                                 .requestMatchers("/admin-page").hasRole(ADMIN.name())
-                                .anyRequest().permitAll()
+                                .anyRequest().authenticated()
                         )
 
                 .formLogin( formLogin -> formLogin
-                        .loginPage("/login")                    // Override /login
+                        .loginPage("/login")
+                        .permitAll()
+
+                        // .successForwardUrl("/")
                         // .usernameParameter("email")
                 )
 
@@ -60,7 +63,7 @@ public class AppSecurityConfig {
                 )
 
                 .logout( logout -> logout
-                        .logoutUrl("/perform_logout")
+                        .logoutUrl("/perform_logout").permitAll()
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID", "remember-me")
