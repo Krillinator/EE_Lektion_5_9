@@ -9,24 +9,18 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.concurrent.TimeUnit;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import static com.krillinator.lektion_5.models.user.Roles.*;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity               // Enables use of @PreAuthorize
+@EnableMethodSecurity
 public class AppSecurityConfig {
-
-    // Info about Authentication & Authorities:
-    // Authentication - identity (Are you who you say you are?) // I am Batman (Username & Password)
-    // Authorities - Role & Permissions
-    //      ROLE_ADMIN  == GET, POST, PUT, DELETE
-    //      ROLE_BATMAN == GET, POST, PUT
-    //      ROLE_USER   == GET, POST
-    //      ROLE_GUEST  == GET
 
     private final AppPasswordConfig appPasswordConfig;
     private final UserEntityDetailsService userEntityDetailsService;
@@ -40,37 +34,19 @@ public class AppSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable)                  // Can cause 403 Forbidden
+                .cors((configure) -> {})
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers("/", "/hash", "/register", "/api/user", "/static/**").permitAll()
                                 .requestMatchers("/admin-page").hasRole(ADMIN.name())
                                 .anyRequest().authenticated()
                         )
 
-                .formLogin( formLogin -> formLogin
-                        .loginPage("/login")
-                        .permitAll()
-
-                        // .successForwardUrl("/")
-                        // .usernameParameter("email")
+                .sessionManagement(configure -> configure
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                .rememberMe(rememberMe -> rememberMe
-                        .tokenValiditySeconds(Math.toIntExact(TimeUnit.DAYS.toSeconds(21)))    // TODO - Do not like casting
-                        .key("someSecureKey")                                                     // TODO - Change to some secure key
-                        .userDetailsService(userEntityDetailsService)
-                        .rememberMeParameter("remember-me")
-                )
-
-                .logout( logout -> logout
-                        .logoutUrl("/perform_logout").permitAll()
-                        .clearAuthentication(true)
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID", "remember-me")
-                        .logoutSuccessUrl("/login")
-                )
-
-                .authenticationProvider(daoAuthenticationProvider())    // Tell Spring to use our implementation (Password & Service)
+                .authenticationProvider(daoAuthenticationProvider())
                 .build();
     }
 
@@ -81,6 +57,19 @@ public class AppSecurityConfig {
         provider.setUserDetailsService(userEntityDetailsService);
 
         return provider;
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 
 
