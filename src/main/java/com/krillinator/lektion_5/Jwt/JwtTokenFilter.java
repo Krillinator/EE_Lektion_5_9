@@ -1,6 +1,5 @@
-package com.krillinator.lektion_5.config.filter;
+package com.krillinator.lektion_5.Jwt;
 
-import com.krillinator.lektion_5.Jwt.JwtTokenGenerator;
 import com.krillinator.lektion_5.models.user.UserEntityDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
