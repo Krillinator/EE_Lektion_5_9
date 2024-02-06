@@ -1,6 +1,6 @@
 package com.krillinator.lektion_5.models.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.krillinator.lektion_5.models.task.TaskEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,6 +26,9 @@ public class UserEntity implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Roles role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<TaskEntity> tasks;
 
     private boolean accountNonExpired;
     private boolean accountNonLocked;
@@ -114,5 +117,13 @@ public class UserEntity implements UserDetails {
 
     public void setCredentialsNonExpired(boolean credentialsNonExpired) {
         this.credentialsNonExpired = credentialsNonExpired;
+    }
+
+    public List<TaskEntity> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<TaskEntity> tasks) {
+        this.tasks = tasks;
     }
 }

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Task</title>
+</head>
+<body>
+
+<div>
+    <h1>Register User Page</h1>
+
+    <form method="post" th:action="@{/task}" th:object="${task}">
+
+        <label for="task">Title</label>
+        <input type="text" th:field="*{title}" placeholder="Title..." id="task" autofocus>
+
+        <label for="description">Description</label>
+        <input type="text" th:field="*{description}" placeholder="Description..." id="description" autofocus>
+
+        <button type="submit"> Create Task </button>
+
+        <!-- Show ANY error in the form -->
+        <div th:if="${#fields.hasAnyErrors()}">
+            <ul>
+                <li th:each="error : ${#fields.allErrors()}" th:text="${error}">
+
+                </li>
+            </ul>
+        </div>
+
+    </form>
+
+
+</div>
+
+</body>
+</html>
+
+</body>
+</html>
