@@ -2,6 +2,7 @@ package com.krillinator.lektion_5.models.user;
 
 import com.krillinator.lektion_5.models.task.TaskEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
