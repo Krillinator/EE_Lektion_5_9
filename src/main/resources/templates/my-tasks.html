@@ -21,7 +21,9 @@
         <td th:text="${task.title}"></td>
         <td th:text="${task.description}"></td>
         <!-- Add a button to edit the task -->
-        <td><a th:href="@{/editTask(taskId=${task.id})}">Edit Task</a></td>
+        <td>
+            <a th:href="@{/editTask(taskId=${task.id})}">Edit Task</a>
+        </td>
     </tr>
     </tbody>
 </table>

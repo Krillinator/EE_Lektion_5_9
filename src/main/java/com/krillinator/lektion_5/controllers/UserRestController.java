@@ -106,6 +106,4 @@ public class UserRestController {
         return new ResponseEntity<>("You can only enter with GET Authority!", HttpStatus.ACCEPTED);
     }
 
-
-
 }

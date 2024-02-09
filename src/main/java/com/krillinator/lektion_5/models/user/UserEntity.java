@@ -31,6 +31,23 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TaskEntity> tasks;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean accountEnabled;

@@ -8,6 +8,7 @@ import com.krillinator.lektion_5.models.user.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,16 +35,9 @@ public class TaskController {
     @GetMapping("myTasks")
     public String showTasksPage(TaskEntity taskEntity, Model model) {
 
-        // Retrieve authentication object to get the current user's information
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // Get the username of the currently logged-in user
         String username = authentication.getName();
-
-        // Find the user entity based on the username (you may need to implement this method in your UserRepository)
         UserEntity currentUser = userRepository.findByUsername(username);
-
-        // Get all tasks associated with the user
         List<TaskEntity> userTasks = currentUser.getTasks();
 
         model.addAttribute("userTasks", userTasks);
@@ -61,7 +55,7 @@ public class TaskController {
 
     @PostMapping("/task")
     public String registerUser(
-            @Valid TaskEntity task,   // Enables Error Messages
+            @AuthenticationPrincipal @Valid TaskEntity task,   // Enables Error Messages
             BindingResult result      // Ties the object with result
     ) {
 
@@ -70,6 +64,7 @@ public class TaskController {
             return "task";
         }
 
+        // TODO - Check for Authentication can be done through @ annotation
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         String username = authentication.getName();
@@ -84,7 +79,11 @@ public class TaskController {
     }
 
     @GetMapping("/editTask")
-    public String showEditTaskPage(@RequestParam("taskId") Long taskId, Model model) {
+    public String showEditTaskPage(
+            @RequestParam("taskId")
+            Long taskId,
+            Model model)
+    {
 
         // Fetch the task details from the repository based on taskId
         TaskEntity task = taskRepository.findById(taskId).orElse(null);
@@ -101,20 +100,23 @@ public class TaskController {
         return "edit-task";
     }
 
+    // Can work as a layer of security through 'permissions'
     @PostMapping("/save-edit-task")
-    public String saveTask(@RequestParam("taskId") Long taskId,
-                           @RequestParam("title") String title,
-                           @RequestParam("description") String description) {
-        // Update the task details in the repository based on taskId
+    public String saveTask(
+            @RequestParam("taskId") Long taskId,
+            @RequestParam("title") String title,
+            @RequestParam("description") String description)
+    {
+
         TaskEntity task = taskRepository.findById(taskId).orElse(null);
         if (task == null) {
-            // Handle task not found error
             return "error-page";
         }
+
         task.setTitle(title);
         task.setDescription(description);
         taskRepository.save(task);
-        // Redirect back to the task page after editing
+
         return "redirect:/myTasks";
     }
 
