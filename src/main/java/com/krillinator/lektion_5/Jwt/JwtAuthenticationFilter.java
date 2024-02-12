@@ -15,13 +15,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-public class JwtTokenFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenGenerator jwtTokenGenerator;
     private final UserEntityDetailsService userEntityDetailsService;
 
     @Autowired
-    public JwtTokenFilter(JwtTokenGenerator jwtTokenGenerator, UserEntityDetailsService userEntityDetailsService) {
+    public JwtAuthenticationFilter(JwtTokenGenerator jwtTokenGenerator, UserEntityDetailsService userEntityDetailsService) {
         this.jwtTokenGenerator = jwtTokenGenerator;
         this.userEntityDetailsService = userEntityDetailsService;
     }

@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Component
 public class JwtTokenGenerator {
 
     private final UserEntityDetailsService userEntityDetailsService;
@@ -18,11 +20,8 @@ public class JwtTokenGenerator {
         this.userEntityDetailsService = userEntityDetailsService;
     }
 
-    @Value("$(jwt.secret)")
-    private String jwtSecret;
-
-    @Value("$(jwt.expiration)")
-    private int jwtExpirationInMs;
+    private final String jwtSecret = "c7754a5ec447c465cb62d586345c08c43b31b71220fa97dcc0260acdeedb7326";
+    private final int jwtExpirationInMs = 3600000;
 
     public String generateToken(Authentication authentication) {
         UserDetails userDetails = userEntityDetailsService.loadUserByUsername(authentication.getName());
@@ -34,7 +33,7 @@ public class JwtTokenGenerator {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
     }
 
